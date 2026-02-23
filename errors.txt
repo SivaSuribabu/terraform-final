@@ -43,3 +43,9 @@ But the OS does NOT have user apache.
 /var/log/eb-engine.log.
 
 "aws route53 list-hosted-zones --query "HostedZones[*].Name"
+
+
+more .bash_profile
+/var/log/eb-engine.log.
+aws route53 list-hosted-zones --query "HostedZones[*].Name
+aws elasticbeanstalk list-platform-versions
