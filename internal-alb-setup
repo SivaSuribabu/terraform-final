@@ -300,3 +300,60 @@ Why NAT if fully internal?
 Is UAT traffic heavy enough to justify ALB?
 
 If this is internal-only and light traffic, a single instance environment may be enough.
+
+
+
+🧮 Assumptions for UAT (per day)
+Item	What we assume
+UAT Duration	10 hours/day
+Days	30 days/month (for monthly extrapolation)
+EC2 Instances	2 EC2 (Beanstalk ASG min=1, avg=2)
+EC2 Type	t3.micro / similar
+ALB	1 internal ALB for 10 hours
+NAT	1 NAT gateway (optional)
+Data Transfer	Minimal (internal traffic only)
+S3 / Docker pull	Assume VPC endpoints or low transfer
+💵 Pricing Components (reference pricing)
+Component	Cost Basis
+NAT Gateway	$0.045/hr (per gateway)
+ALB (Application Load Balancer)	~$0.0225/hr base + LCU processing (low)
+EC2 t3.micro	~$0.010/hr (On-Demand)
+EIP Public IP	$0.005/hr (only if NAT uses Elastic IP)
+Data transfer	negligible for internal traffic
+📊 Scenario A — With NAT
+
+You keep a NAT gateway so your private subnets can reach public endpoints (e.g., Docker registries, package repos).
+
+Hourly (10 hours/day)
+
+NAT Gateway: 0.045 * 10 = $0.45
+
+ALB (base only): 0.0225 * 10 = $0.225
+
+EC2 Instances (2 * t3.micro): 2 * 0.010 * 10 = $0.20
+
+EIP for NAT (optional): 0.005 * 10 = $0.05
+
+Total / day with NAT ≈ $0.925 / day
+
+Monthly Equivalent (30 days)
+
+≈ $27.75 / month (for just the UAT hours)
+
+(This excludes data processing via NAT, which adds per-GB cost only if you actively reroute traffic through NAT to internet.)
+
+📊 Scenario B — Without NAT
+
+Your private instances stay completely internal and use VPC endpoints (for S3/Docker registry) instead of NAT.
+
+Hourly (10 hours/day)
+
+ALB: 0.0225 * 10 = $0.225
+
+EC2 (2 * t3.micro): 0.20
+
+Total / day without NAT ≈ $0.425 / day
+
+Monthly Equivalent (30 days)
+
+≈ $12.75 / month
