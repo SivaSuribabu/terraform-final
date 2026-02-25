@@ -1,13 +1,9 @@
-You’re thinking correctly about cost control (10-hour UAT), but if you recreate everything daily, you’ll introduce:
+**You’re thinking correctly about cost control (10-hour UAT), but if you recreate everything daily, you’ll introduce:**
 
 DNS propagation delays
-
 Beanstalk environment stabilization time (10–20 mins)
-
 Load balancer re-provisioning delays
-
 Drift + pipeline instability
-
 Developer friction
 
 So the right approach is:
@@ -20,47 +16,31 @@ Make compute ephemeral.
 These resources should never be destroyed daily.
 
 Network Layer (Static Foundation)
-
 VPC
-
 Private subnets (min 2 AZs)
-
 Public subnets (only if NAT needed)
-
 NAT Gateway (if private instances need internet)
-
 Route tables
-
 Internet Gateway (if NAT used)
 
 These are slow + expensive to recreate and cause route propagation delays.
 
 Security & Identity (Static)
-
 Security Groups
-
 IAM Roles
-
 Beanstalk service role
-
 EC2 instance profile role
-
 KMS keys (if used)
-
 S3 artifact bucket (for Beanstalk versions)
 
 Destroying these daily causes dependency chaos.
-
 Internal DNS (Static)
-
 Route53 Private Hosted Zone
-
 UAT internal record (ALIAS → ALB)
 
 Example:
 
 uat.internal.company.local
-
 Don’t recreate this daily — DNS caching will hurt you.
 
 2️⃣ What Should Be Ephemeral (10 Hours Only)
@@ -68,15 +48,10 @@ Don’t recreate this daily — DNS caching will hurt you.
 Only these should be created/destroyed daily:
 
 Elastic Beanstalk Application
-
 Elastic Beanstalk Environment
-
 Auto Scaling Group
-
 EC2 instances
-
 Internal ALB (created by Beanstalk)
-
 Target Groups
 
 When you terminate the environment → everything above goes.
@@ -98,11 +73,9 @@ Here is the full internal-only flow:
                            |
                            |
                     EC2 in Private Subnets
-                           |
-                           |
-                        RDS (private)
-4️⃣ Visual Architecture
-4
+                   
+
+
 5️⃣ Terraform Modular Structure (Enterprise Grade)
 
 You need layered modules.
@@ -125,46 +98,35 @@ terraform/
 │
 └── shared/
     ├── locals.tf
+
 6️⃣ Implementation Flow (Step-by-Step)
 Phase 1 — One-Time Setup (Static Layer)
 Step 1: Create VPC module
-
 2 private subnets
-
 NAT Gateway
-
 Route tables
 
 Outputs:
-
 vpc_id
-
 private_subnet_ids
 
 Step 2: Security Groups
-
 ALB SG
-
 Allow 80/443 from VPN CIDR only
 
 EC2 SG
-
 Allow 8080 from ALB SG only
 
 No public ingress. Zero 0.0.0.0/0.
 
 Step 3: IAM
-
 aws-elasticbeanstalk-service-role
-
 ec2-instance-profile role
 
 Step 4: Private Route53 Zone
 
 Example:
-
 uat.internal.devopswithsiva.in
-
 Associate with VPC.
 
 Phase 2 — Ephemeral Layer (Daily 10 Hours)
@@ -200,50 +162,38 @@ setting {
   value     = "internal"
 }
 Step 7: Route53 Alias Record
-
 Alias to:
-
 data.aws_lb.beanstalk_alb.dns_name
+
 7️⃣ How to Auto Destroy After 10 Hours
 
 You have 3 clean options:
 
 Option A — Jenkins Scheduled Pipeline (Best for You)
-
 Since you're already working with Jenkins + Terraform:
 
 Pipeline:
-
 terraform apply
-
 Sleep 10 hours
-
 terraform destroy
 
 Better:
-
 Use AWS EventBridge + Lambda instead of sleep.
-
 Option B — EventBridge + Lambda Auto Destroy
-
 Flow:
-
 EventBridge rule (cron)
         ↓
 Lambda
         ↓
 terraform destroy (via SSM or container)
-
 More production grade.
+
 
 Option C — Scale to Zero (Better Than Destroy)
 
 Instead of destroying:
-
 Set ASG min=0 max=0 after 10 hours.
-
 Keep environment alive.
-
 No recreation delays next day.
 
 This is usually smarter.
@@ -256,9 +206,7 @@ Internal ALB = billed hourly
 NAT Gateway = billed hourly (big cost driver)
 
 If UAT is internal only:
-
 Do you even need NAT?
-
 If your app doesn't pull from internet → remove NAT.
 
 That alone saves major cost.
@@ -284,11 +232,11 @@ EC2 (Private)
 Database (Private)
 
 Terraform Flow:
-
 terraform apply (static stack)
 terraform apply (uat env stack)
 10 hours
 terraform destroy (uat env only)
+
 11️⃣ Hard Questions You Must Answer
 
 Why Beanstalk instead of ECS if you already use ECS heavily?
@@ -313,6 +261,8 @@ ALB	1 internal ALB for 10 hours
 NAT	1 NAT gateway (optional)
 Data Transfer	Minimal (internal traffic only)
 S3 / Docker pull	Assume VPC endpoints or low transfer
+
+
 💵 Pricing Components (reference pricing)
 Component	Cost Basis
 NAT Gateway	$0.045/hr (per gateway)
@@ -320,8 +270,9 @@ ALB (Application Load Balancer)	~$0.0225/hr base + LCU processing (low)
 EC2 t3.micro	~$0.010/hr (On-Demand)
 EIP Public IP	$0.005/hr (only if NAT uses Elastic IP)
 Data transfer	negligible for internal traffic
-📊 Scenario A — With NAT
 
+
+📊 Scenario A — With NAT
 You keep a NAT gateway so your private subnets can reach public endpoints (e.g., Docker registries, package repos).
 
 Hourly (10 hours/day)
