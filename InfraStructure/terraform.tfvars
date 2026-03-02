@@ -14,19 +14,19 @@ aws_region = "ap-south-1"
 # PROJECT AND ENVIRONMENT NAMING
 # ============================================================================
 # Project name for resource naming and tagging
-project_name = "indian-eagle-uat-infra"
+project_name = "suribabu-uat-infra"
 
 # Environment name for resource naming and tagging (dev, staging, uat, prod)
-environment_name = "ieagle-uat-env"
+environment_name = "suribabu-uat-env"
 
 # ============================================================================
 # ELASTIC BEANSTALK APPLICATION CONFIGURATION
 # ============================================================================
 # Name for the Elastic Beanstalk application
-app_name = "ieagle-uat-application"
+app_name = "suribabu-uat-application"
 
 # Name for the Elastic Beanstalk environment
-env_name = "ieagle-uat-environment"
+env_name = "suribabu-uat-environment"
 
 
 # Using: 64bit Amazon Linux 2 v5.8.2 running Tomcat 9 Corretto 11
@@ -59,18 +59,18 @@ max_size = 1
 
 # VPC ID where the Beanstalk environment will be deployed
 # Example format: vpc-0123456789abcdef0
-vpc_id = "vpc-022db108ebbe4d4d4"
+vpc_id = "vpc-089a69f9765b6bd52"
 
 # List of private subnet IDs for EC2 instances
 # EC2 instances will be placed in these private subnets for security
 # Provide at least 2 subnets for high availability
 # Example format: ["subnet-0123456789abcdef0", "subnet-0123456789abcdef1"]
-private_subnets = ["subnet-0a15856df8b0df84d", "subnet-068d91f86866c8e57"]
+private_subnets = ["subnet-0108669173b478aa0", "subnet-04ea9ba32d0776e2d"]
 
 # List of public subnet IDs for the Application Load Balancer
 # The ALB will be internet-facing in these public subnets
 # Example format: ["subnet-0123456789abcdef0", "subnet-0123456789abcdef1"]
-public_subnets = ["subnet-0a15856df8b0df84d", "subnet-068d91f86866c8e57"]
+public_subnets = ["subnet-0108669173b478aa0", "subnet-04ea9ba32d0776e2d"]
 
 # ============================================================================
 # CUSTOM DOMAIN AND SSL/TLS CONFIGURATION
@@ -79,13 +79,13 @@ public_subnets = ["subnet-0a15856df8b0df84d", "subnet-068d91f86866c8e57"]
 
 # Custom domain name for the application
 # This will be configured to point to the load balancer
-custom_domain = "uat.spieagle.com"
+custom_domain = "www.devopswithsiva.info"
 
 # ARN of the AWS Certificate Manager (ACM) certificate for HTTPS/SSL
 # The certificate must be issued for the custom domain
 # Format: arn:aws:acm:ap-south-1:123456789012:certificate/12345678-1234-1234-1234-123456789012
 # To get your ACM certificate ARN, run: aws acm list-certificates --region ap-south-1
-acm_certificate_arn = "arn:aws:acm:ap-south-1:571355911189:certificate/ebb08b34-a6f3-41e7-a37f-4ad2a0136089"
+acm_certificate_arn = "arn:aws:acm:ap-south-1:644209053375:certificate/a4cf6ec6-8014-4fb5-b615-f5f3900b881e"
 
 # ============================================================================
 # APPLICATION SOURCE CODE CONFIGURATION
@@ -95,11 +95,11 @@ acm_certificate_arn = "arn:aws:acm:ap-south-1:571355911189:certificate/ebb08b34-
 # S3 bucket name containing the application WAR file
 # The bucket must be in the same region (ap-south-1)
 # The bucket must allow Beanstalk EC2 instances to read the files
-source_code_bucket = "ie-uat-infra"
+source_code_bucket = "terraform-root-file-bucket-uat"
 
 # S3 object key (path) of the WAR file within the bucket
 # Example: "releases/app-1.0.0.war"
-source_code_key = "ie-uat-source-code/ROOT.war"
+source_code_key = "ROOT.war"
 
 # ============================================================================
 # HEALTH CHECK CONFIGURATION

@@ -8,10 +8,10 @@
 terraform {
   backend "s3" {
     # S3 bucket name where the state file will be stored
-    bucket = "ie-uat-infra"
+    bucket = "terraform-root-file-bucket-uat"
     
     # Path to the state file within the bucket
-    key    = "uat-infra/terraform.tfstate"
+    key    = "beanstalk-app/terraform.tfstate"
     
     # AWS region where the S3 bucket is located
     region = "ap-south-1"
